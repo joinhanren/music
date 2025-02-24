@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: music
+
+
+server:
+  port: 8080
+
+
+minio:
+  endPoint: http://14.103.242.5:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: music
+
+
+
