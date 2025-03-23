@@ -1,9 +1,13 @@
-package com.example.music;
+package com.example;
 
+import com.example.music.config.MinioConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+
 
 @SpringBootApplication
+@EnableConfigurationProperties(MinioConfig.class)
 public class MusicApplication {
 
     public static void main(String[] args) {

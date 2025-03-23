@@ -1,6 +1,8 @@
 package com.example.music.config;
 
 import io.minio.MinioClient;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
  * Date : 2025/2/24 下午9:25
  */
 @Configuration
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "minio")
 public class MinioConfig {
 
@@ -21,13 +25,12 @@ public class MinioConfig {
 
 
     @Bean
-    public MinioClient minioClient(){
+    public MinioClient minioClient() {
         return MinioClient.builder()
                 .endpoint(endPoint).
-                credentials(accessKey,bucketName)
+                credentials(accessKey, bucketName)
                 .build();
     }
-
 
 
 }

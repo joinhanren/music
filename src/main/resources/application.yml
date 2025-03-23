@@ -2,16 +2,42 @@ spring:
   application:
     name: music
 
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://14.103.242.5:3306/music?serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=utf8
+    username: root
+    password: Zhu12345@
+
+
+
+  mail:
+    default-encoding: utf-8
+    host: smtp.qq.com
+    username: 2625727808@qq.com
+    password: sdhxtxzllumndihf  #个人邮箱key
+    port: 465
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+            required: true
+          auth: true
+        debug: true
+
 
 server:
   port: 8080
 
 
 minio:
-  endPoint: http://14.103.242.5:9000
-  accessKey: minioadmin
-  secretKey: minioadmin
-  bucketName: music
+  end-point: http://14.103.242.5:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: music
+
+
+
 
 
 
