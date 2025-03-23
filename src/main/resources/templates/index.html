@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐网站登录</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #2E3192, #1BFFFF);
+            animation: gradientBG 6s infinite alternate;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: left;
+            }
+            100% {
+                background-position: right;
+            }
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: white;
+            width: 320px;
+            animation: fadeIn 1s ease-in-out;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .logo {
+            font-size: 50px;
+            margin-bottom: 10px;
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #FF7EB3;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: #FF5878;
+            transform: scale(1.05);
+        }
+
+        .toggle-text {
+            margin-top: 15px;
+            cursor: pointer;
+            color: #FFB6C1;
+            font-size: 14px;
+        }
+
+        .toggle-text:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 20px;
+            color: white;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+<div class="box" id="auth-box">
+    <div class="logo">🎵</div>
+    <h2 id="form-title">登录</h2>
+
+    <div id="login-form">
+        <input type="email" id="login-email" placeholder="邮箱">
+        <input type="password" id="login-password" placeholder="密码">
+        <button onclick="login()">登录</button>
+        <p class="toggle-text" onclick="toggleForm()">没有账号？注册</p>
+    </div>
+
+    <div id="register-form" style="display: none;">
+        <input type="text" id="register-name" placeholder="用户名">
+        <input type="email" id="register-email" placeholder="邮箱">
+        <input type="password" id="register-password" placeholder="密码">
+        <button onclick="register()">注册</button>
+        <p class="toggle-text" onclick="toggleForm()">已有账号？登录</p>
+    </div>
+</div>
+
+<div class="footer">© 2025 音乐网站. 保留所有权利.</div>
+
+<script>
+    function toggleForm() {
+        let loginForm = document.getElementById("login-form");
+        let registerForm = document.getElementById("register-form");
+        let formTitle = document.getElementById("form-title");
+
+        if (loginForm.style.display === "none") {
+            loginForm.style.display = "block";
+            registerForm.style.display = "none";
+            formTitle.innerText = "登录";
+        } else {
+            loginForm.style.display = "none";
+            registerForm.style.display = "block";
+            formTitle.innerText = "注册";
+        }
+    }
+
+    function login() {
+        let email = document.getElementById("login-email").value;
+        let password = document.getElementById("login-password").value;
+
+        if (email === "" || password === "") {
+            alert("请输入邮箱和密码！");
+            return;
+        }
+
+        alert("登录成功，欢迎 " + email + "！");
+    }
+
+    function register() {
+        let name = document.getElementById("register-name").value;
+        let email = document.getElementById("register-email").value;
+        let password = document.getElementById("register-password").value;
+
+        if (name === "" || email === "" || password === "") {
+            alert("请填写完整的注册信息！");
+            return;
+        }
+
+        alert("注册成功，欢迎 " + name + "！");
+    }
+</script>
+</body>
+</html>
