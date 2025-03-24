@@ -1,6 +1,6 @@
 package com.example;
 
-import com.example.music.config.MinioConfig;
+import com.example.globalConfig.minio.MinioConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

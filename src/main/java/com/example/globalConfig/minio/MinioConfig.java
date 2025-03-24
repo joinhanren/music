@@ -1,4 +1,4 @@
-package com.example.music.config;
+package com.example.globalConfig.minio;
 
 import io.minio.MinioClient;
 import lombok.Getter;

@@ -3,6 +3,8 @@ package com.example.music.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -13,7 +15,10 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "music")  // 指定数据库表名
-public class MusicEntity {
+public class MusicEntity  implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 0L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 自增主键
@@ -34,6 +39,7 @@ public class MusicEntity {
     @Column(name = "duration_seconds")
     private int durationInSeconds; // 音频时长（秒）
 
+    @Column(name = "auth")
     private String auth;
 
     @Column(nullable = false)
