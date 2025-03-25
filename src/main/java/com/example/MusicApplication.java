@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 
 @SpringBootApplication
-@EnableConfigurationProperties(MinioConfig.class)
 public class MusicApplication {
 
     public static void main(String[] args) {

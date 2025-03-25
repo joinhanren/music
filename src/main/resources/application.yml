@@ -30,9 +30,6 @@ spring:
       host: 14.103.242.5
       database: 0
 
-
-
-
 server:
   port: 8080
 

@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>音乐网站登录</title>
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -120,6 +119,50 @@
             font-size: 12px;
             opacity: 0.8;
         }
+
+        /* 新增验证码输入框和按钮样式 */
+        .captcha-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .captcha-container input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .captcha-container button {
+            width: 120px;
+            background: #4CAF50;
+            padding: 10px;
+            border: none;
+            color: white;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .captcha-container button:disabled {
+            background: #B0BEC5;
+            cursor: not-allowed;
+        }
+
+        .captcha-container button:hover {
+            background: #388E3C;
+        }
+
+        .captcha-container button:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -138,6 +181,13 @@
         <input type="text" id="register-name" placeholder="用户名">
         <input type="email" id="register-email" placeholder="邮箱">
         <input type="password" id="register-password" placeholder="密码">
+
+        <!-- 新增验证码部分 -->
+        <div class="captcha-container">
+            <input type="text" id="register-captcha" placeholder="请输入验证码" disabled>
+            <button id="captcha-btn" onclick="requestCaptcha()">获取验证码</button>
+        </div>
+
         <button onclick="register()">注册</button>
         <p class="toggle-text" onclick="toggleForm()">已有账号？登录</p>
     </div>
@@ -146,6 +196,23 @@
 <div class="footer">© 2025 音乐网站. 保留所有权利.</div>
 
 <script>
+
+
+    // 初始化 FingerprintJS
+    const fpPromise = FingerprintJS.load();
+    async function getFingerprint() {
+        const fp = await fpPromise;
+        const result = await fp.get();
+        console.log("浏览器指纹:", result.visitorId);
+        return result.visitorId;
+    }
+
+    // 调用获取指纹
+    getFingerprint();
+
+    let captchaCode = "";  // 用于存储从后端获取的验证码
+    let countdown = 60; // 倒计时秒数
+
     function toggleForm() {
         let loginForm = document.getElementById("login-form");
         let registerForm = document.getElementById("register-form");
@@ -174,13 +241,71 @@
         alert("登录成功，欢迎 " + email + "！");
     }
 
+    function requestCaptcha() {
+        let email = document.getElementById("register-email").value;
+
+        if (email === "") {
+            alert("请输入邮箱！");
+            return;
+        }
+
+        // 禁用验证码按钮，开始倒计时
+        document.getElementById("captcha-btn").disabled = true;
+
+        // 请求验证码到后端
+        fetch('/send-captcha', { // 后端接口路径
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    captchaCode = data.captcha;  // 获取后端返回的验证码
+                    alert("验证码已发送到您的邮箱！");
+                    startCountdown();
+                } else {
+                    alert("发送验证码失败，请重试！");
+                    document.getElementById("captcha-btn").disabled = false; // 恢复按钮
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("请求失败，请稍后再试！");
+                document.getElementById("captcha-btn").disabled = false; // 恢复按钮
+            });
+    }
+
+    // 倒计时功能
+    function startCountdown() {
+        let countdownInterval = setInterval(() => {
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                document.getElementById("captcha-btn").disabled = false;
+                document.getElementById("captcha-btn").innerText = "获取验证码";
+                countdown = 60; // 重置倒计时
+            } else {
+                document.getElementById("captcha-btn").innerText = `${countdown}s 后重试`;
+                countdown--;
+            }
+        }, 1000);
+    }
+
     function register() {
         let name = document.getElementById("register-name").value;
         let email = document.getElementById("register-email").value;
         let password = document.getElementById("register-password").value;
+        let captchaInput = document.getElementById("register-captcha").value;
 
-        if (name === "" || email === "" || password === "") {
+        if (name === "" || email === "" || password === "" || captchaInput === "") {
             alert("请填写完整的注册信息！");
+            return;
+        }
+
+        if (captchaInput !== captchaCode) {
+            alert("验证码错误，请重试！");
             return;
         }
 
