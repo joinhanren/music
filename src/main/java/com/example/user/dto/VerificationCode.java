@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Map;
  * Date : 2025/3/26 下午10:42
  */
 @Data
-public class VerificationCode implements Serializable {
+public class VerificationCode implements Serializable,Cloneable {
 
     @Serial
     private static final long serialVersionUID = -1L;
@@ -25,4 +26,14 @@ public class VerificationCode implements Serializable {
     private String code;
 
 
+    @Override
+    public VerificationCode clone() {
+        try {
+            VerificationCode clone = (VerificationCode) super.clone();
+            clone.sendTable = new HashMap<>(this.sendTable);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

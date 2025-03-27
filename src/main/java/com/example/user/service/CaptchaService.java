@@ -1,7 +1,7 @@
 package com.example.user.service;
 
 import com.example.user.dto.CaptchaDTO;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.example.user.enums.CaptchaStatus;
 
 /**
  * @Author : join
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface CaptchaService {
 
 
-    public boolean sendCaptcha(CaptchaDTO captchaDTO) throws Exception;
+    public CaptchaStatus sendCaptcha(CaptchaDTO captchaDTO);
 
 
 }

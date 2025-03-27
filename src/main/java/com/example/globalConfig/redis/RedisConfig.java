@@ -23,23 +23,33 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(factory);
-        //序列化
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
+
+        // 创建 ObjectMapper 来处理 JSON 的序列化/反序列化
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator());
-        jackson2JsonRedisSerializer.serialize(objectMapper);
+        objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL); // 保证多态支持
 
-        //string 序列化
+        // 直接通过构造函数传入 ObjectMapper
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+
+        // 设置自定义的 ObjectMapper
+        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+
+        // 设置 key 的序列化方式：StringRedisSerializer 用于处理键的序列化
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+
+        // 设置 RedisTemplate 的序列化器
         redisTemplate.setKeySerializer(stringRedisSerializer);
         redisTemplate.setHashKeySerializer(stringRedisSerializer);
-
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
-        redisTemplate.setHashKeySerializer(jackson2JsonRedisSerializer);
+        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
+
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
+
+
+
 
 
 }

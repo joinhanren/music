@@ -200,6 +200,7 @@
 
     // 初始化 FingerprintJS
     const fpPromise = FingerprintJS.load();
+
     async function getFingerprint() {
         const fp = await fpPromise;
         const result = await fp.get();
@@ -241,41 +242,55 @@
         alert("登录成功，欢迎 " + email + "！");
     }
 
-    function requestCaptcha() {
+    async function requestCaptcha() {
         let email = document.getElementById("register-email").value;
-
         if (email === "") {
             alert("请输入邮箱！");
             return;
         }
-
         // 禁用验证码按钮，开始倒计时
         document.getElementById("captcha-btn").disabled = true;
-
         // 请求验证码到后端
-        fetch('/send-captcha', { // 后端接口路径
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email: email })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    captchaCode = data.captcha;  // 获取后端返回的验证码
-                    alert("验证码已发送到您的邮箱！");
-                    startCountdown();
-                } else {
-                    alert("发送验证码失败，请重试！");
-                    document.getElementById("captcha-btn").disabled = false; // 恢复按钮
-                }
+        const fingerprint = await getFingerprint(); // 等待获取指纹
+        try {
+            fetch('/send-captcha', { // 后端接口路径
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        email: email,
+                        fingerprint: fingerprint
+                    }
+                )
             })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("请求失败，请稍后再试！");
-                document.getElementById("captcha-btn").disabled = false; // 恢复按钮
-            });
+                .then(response => {
+                    let text = response.text();
+                    switch (response.status) {
+                        case 200:
+                            startCountdown();
+                            alert("验证码发送成功，请查收邮件！");
+                            break;
+                        case 429:
+                            startCountdown();
+                            alert("⚠️发送过于频繁，请稍后再试！");
+                            break;
+                        case 404:
+                            console.error("❌ 邮箱未找到:", text);
+                            alert("邮箱地址未找到，请检查输入！");
+                            document.getElementById("captcha-btn").disabled = false; // 恢复按钮
+                            break;
+                        default:
+                            console.error("❓ 未知错误:", response.status, text);
+                            alert("系统异常，请稍后再试！");
+                            document.getElementById("captcha-btn").disabled = false; // 恢复按钮
+                    }
+                })
+        } catch (error) {
+            alert("请求失败，请稍后再试！");
+            document.getElementById("captcha-btn").disabled = false; // 恢复按钮
+        }
     }
 
     // 倒计时功能
