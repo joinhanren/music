@@ -33,12 +33,12 @@ public class CaptchaServiceImpl implements CaptchaService {
     public CaptchaStatus sendCaptcha(CaptchaDTO captchaDTO) {
         String redisKey = "captcha:" + captchaDTO.getFingerprint();
         VerificationCode code = (VerificationCode) redisTemplate.opsForValue().get(redisKey);
-        String captcha =CaptchaUtil.generateNumericCaptcha(6);
+        String captcha = CaptchaUtil.generateNumericCaptcha(6);
         String codeText = STR. "<h3>您的验证码是： \{ captcha }</h3><p>有效期5分钟，请勿泄露。</p>" ;
         String suject = "注册验证码";
         // 如果 Redis 中没有验证码信息，则初始化
         if (code == null) {
-            saveNewCaptcha(redisKey, captchaDTO,captcha);
+            saveNewCaptcha(redisKey, captchaDTO, captcha);
             try {
                 mail.sendHtmlMail(captchaDTO.getEmail(), suject, codeText);
             } catch (MessagingException e) {
@@ -46,6 +46,11 @@ public class CaptchaServiceImpl implements CaptchaService {
                 return CaptchaStatus.EMAIL_NOT_FOUND;
             }
             return CaptchaStatus.SUCCESS;
+        }
+        //判断发送间隔时间
+        long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis - code.getCurrentTimeMillis() < 1000 * 60) {
+            return CaptchaStatus.TOO_MANY_REQUESTS;
         }
         VerificationCode clone = code.clone();
         // 检查发送次数是否超限
@@ -64,6 +69,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         sendTable.put(captchaDTO.getEmail(), emailCount + 1);
         code.setTotal(code.getTotal() + 1);
         code.setCode(captcha);
+        code.setCurrentTimeMillis(currentTimeMillis);
         // 存入 Redis
         redisTemplate.opsForValue().set(redisKey, code, 5L, TimeUnit.MINUTES);
         // send email advise
@@ -80,13 +86,14 @@ public class CaptchaServiceImpl implements CaptchaService {
     /**
      * 生成新的验证码并存入 Redis
      */
-    private boolean saveNewCaptcha(String redisKey, CaptchaDTO captchaDTO,String code) {
+    private boolean saveNewCaptcha(String redisKey, CaptchaDTO captchaDTO, String code) {
         VerificationCode verificationCode = new VerificationCode();
         verificationCode.setTotal(1);
         HashMap<String, Integer> hashMap = new HashMap<>();
         hashMap.put(captchaDTO.getEmail(), 1);
         verificationCode.setCode(code);
         verificationCode.setSendTable(hashMap);
+        verificationCode.setCurrentTimeMillis(System.currentTimeMillis());
         // 存入 Redis
         redisTemplate.opsForValue().set(redisKey, verificationCode, 5L, TimeUnit.MINUTES);
         return true;

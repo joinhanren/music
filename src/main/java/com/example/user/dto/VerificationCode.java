@@ -24,6 +24,8 @@ public class VerificationCode implements Serializable,Cloneable {
     private Map<String, Integer> sendTable;
     //验证码
     private String code;
+    //
+    private long currentTimeMillis;
 
 
     @Override
