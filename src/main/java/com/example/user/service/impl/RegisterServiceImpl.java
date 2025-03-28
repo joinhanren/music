@@ -47,6 +47,7 @@ public class RegisterServiceImpl implements RegisterService {
         user.setUsername(registerUserDTO.getUsername());
         user.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
         userRepository.save(user);
+        redisTemplate.delete(redisKey);
         return RegisterStatus.SUCCESS;
     }
 }
