@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>音乐网站登录</title>
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -184,7 +185,7 @@
 
         <!-- 新增验证码部分 -->
         <div class="captcha-container">
-            <input type="text" id="register-captcha" placeholder="请输入验证码" disabled>
+            <input type="text" id="register-captcha" placeholder="请输入验证码">
             <button id="captcha-btn" onclick="requestCaptcha()">获取验证码</button>
         </div>
 
@@ -308,24 +309,59 @@
         }, 1000);
     }
 
-    function register() {
+    async function register() {
         let name = document.getElementById("register-name").value;
         let email = document.getElementById("register-email").value;
         let password = document.getElementById("register-password").value;
         let captchaInput = document.getElementById("register-captcha").value;
 
-        if (name === "" || email === "" || password === "" || captchaInput === "") {
+        if (!name || !email || !password || !captchaInput) {
             alert("请填写完整的注册信息！");
             return;
         }
 
-        if (captchaInput !== captchaCode) {
-            alert("验证码错误，请重试！");
-            return;
-        }
+        const fingerprint = await getFingerprint(); // 获取指纹
+        // **密码进行 MD5 加密**
+        let encryptedPassword = CryptoJS.MD5(password).toString();
+        try {
+            let response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: name,
+                    email: email,
+                    password: encryptedPassword,
+                    captcha: captchaInput,
+                    fingerprint: fingerprint
+                })
+            });
 
-        alert("注册成功，欢迎 " + name + "！");
+            let responseText = await response.text(); // 获取响应文本（如果后端返回错误信息）
+            switch (response.status) {
+                case 200:
+                    alert("✅ 注册成功!");
+                    break;
+                case 409:
+                    alert("⚠️ 该邮箱已被注册，请更换邮箱！");
+                    break;
+                case 401:
+                    alert("❌ 验证码错误，请重新输入！");
+                    break;
+                case 429:
+                    alert("⏳ 发送过于频繁，请稍后再试！");
+                    break;
+                default:
+                    console.error("❓ 未知错误:", response.status, responseText);
+                    alert("🚨 系统异常，请稍后再试！");
+            }
+        } catch (error) {
+            console.error("❌ 网络请求失败:", error);
+            alert("❌ 请求失败，请检查网络连接！");
+        }
     }
+
 </script>
 </body>
 </html>

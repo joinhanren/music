@@ -25,5 +25,8 @@ public class RegisterUserDTO {
     @NotBlank(message = "验证码不能为空！")
     private String captcha;
 
+    @NotBlank(message = "指纹不能为空")
+    private String fingerprint;
+
 
 }

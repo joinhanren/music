@@ -3,6 +3,7 @@ package com.example.user.controller;
 import com.example.user.dto.CaptchaDTO;
 import com.example.user.enums.CaptchaStatus;
 import com.example.user.service.CaptchaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class CaptchaController {
     private CaptchaService captchaService;
 
     @PostMapping(value = "/send-captcha", consumes = "application/json")
-    public ResponseEntity<String> sendCaptcha(@RequestBody CaptchaDTO captchaDTO) {
+    public ResponseEntity<String> sendCaptcha(@Valid @RequestBody CaptchaDTO captchaDTO) {
         try {
             CaptchaStatus captchaStatus = captchaService.sendCaptcha(captchaDTO);
             return ResponseEntity.status(captchaStatus.getCode()).body(captchaStatus.getMessage());
