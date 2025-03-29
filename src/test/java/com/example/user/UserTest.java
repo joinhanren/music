@@ -18,6 +18,10 @@ public class UserTest {
 
 
     @Test
+    void contextLoads() {
+    }
+
+    @Test
     public void testBCryptPasswordEncoder() {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String encode = bCryptPasswordEncoder.encode("123");

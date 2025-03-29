@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+
+
 /**
  * @Author : join
  * @Description :
@@ -34,7 +36,8 @@ public class CaptchaServiceImpl implements CaptchaService {
         String redisKey = "captcha:" + captchaDTO.getFingerprint();
         VerificationCode code = (VerificationCode) redisTemplate.opsForValue().get(redisKey);
         String captcha = CaptchaUtil.generateNumericCaptcha(6);
-        String codeText = STR. "<h3>您的验证码是： \{ captcha }</h3><p>有效期5分钟，请勿泄露。</p>" ;
+//        String codeText = STR."<h3>您的验证码是： \{ captcha }</h3><p>有效期5分钟，请勿泄露。</p>" ;
+        String codeText = "<h3>您的验证码是： " + captcha + "</h3><p>有效期5分钟，请勿泄露。</p>";
         String suject = "注册验证码";
         // 如果 Redis 中没有验证码信息，则初始化
         if (code == null) {
